@@ -70,13 +70,25 @@ def upload_file():
     return render_template("upload.html", empty=empty, is_csv=is_csv)
 
 
+@app.route('/files/<int:id>/delete')
+def delete_file(id):
+    file = db.session.get(File, id)
+
+    try:
+        db.session.delete(file)
+        db.session.commit()
+        return redirect('/files')
+    except Exception:
+        return render_template("index.html", err=True)
+
+
 @app.route('/files/search', methods=['GET'])
 def search():
-    filename = request.values.get('file')
+    name = request.values.get('file')
 
     with db.engine.connect() as conn:
         query = conn.execute(text(
-            f"SELECT * FROM file WHERE name LIKE '%{filename}%' ORDER BY id DESC"
+            f"SELECT * FROM file WHERE name LIKE '%{name}%' ORDER BY id DESC"
         )).fetchall()
 
     return render_template("index.html", files=query)
