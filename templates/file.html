@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Загрузка файла
+{% endblock %}
+
+{% block body %}
+<div class="text-success">
+    <h2>{{ file.name }}</h2>
+</div>
+    <div class="alert alert-secondary">
+    <table id="myTable" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>№</th>
+          {% for column in columns%}
+            <th>{{ column }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in query %}
+        <tr>
+          {% for el in row %}
+            <td>{{ el }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -7,7 +7,10 @@
 {% block body %}
     <h1>Загрузка файла</h1>
     <p>
-        <form action="/download" method="post" enctype="multipart/form-data">
+        <form action="/files/upload" method="post" enctype="multipart/form-data">
+            {% if is_csv %}
+            <p> <b>Ошибка:</b> <i>выберите файл в формате CSV</i></p>
+            {% endif %}
             <p><input type="file" name="file" clss="form-control"></p>
             {% if empty %}
             <p> <b>Ошибка:</b> <i>убедитесь, что файл не пустой</i></p>
@@ -16,3 +19,12 @@
         </form>
     </p>
 {% endblock %}
+
+$(document).ready(function(){
+    $("#myInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#myTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  });

@@ -28,49 +28,80 @@ def files():
 
 
 @app.route('/files/upload', methods=['POST', 'GET'])
-def download_file():
-    print(request.endpoint)
+def upload_file():
+    empty = False
+    is_csv = False
+
     if request.method == "POST":
         uploaded_file = request.files['file']
+
         if uploaded_file:
             filename = uploaded_file.filename
             content = uploaded_file.read()
+            format = filename[len(filename)-4:]
+
             if not content:
-                return render_template("download.html", empty=True)
+                empty = True
+
+            if format != ".csv":
+                is_csv = True
+
+            if empty or is_csv:
+                return render_template(
+                    "upload.html", empty=empty, is_csv=is_csv
+                )
+
             uploaded_file.stream.seek(0)
-            raw_data = pd.read_csv(
-                uploaded_file, sep=None, engine='python')
-            # print(raw_data)
-            # print(pd.read_csv(io.BytesIO(content),
-            #       encoding='utf8', sep=None, engine='python'))
+            raw_data = pd.read_csv(uploaded_file, sep=None, engine='python')
             columns = raw_data.columns.to_list()
-            file = File(name=filename, columns="; ".join(
-                columns), data=content)
+            file = File(
+                name=filename,
+                columns="; ".join(columns),
+                data=content
+            )
 
             try:
                 db.session.add(file)
                 db.session.commit()
                 return redirect('/files')
             except Exception:
-                return "Ошибка при загрузке файла"
+                return render_template("upload.html", empty=True, is_csv=True)
 
-            # raw_data = pd.read_csv(
-            #     request.files['file'], sep=None, engine='python')
-            # print(raw_data)
-    return render_template("download.html", empty=False)
+    return render_template("upload.html", empty=empty, is_csv=is_csv)
 
 
 @app.route('/files/search', methods=['GET'])
-def search(id=None):
+def search():
     filename = request.values.get('file')
-    print(filename)
+
     with db.engine.connect() as conn:
-        print(conn.engine)
-        query = conn.execute(
-            text(
-                f"SELECT * FROM file WHERE name LIKE '%{filename}%' ORDER BY id DESC"
-            )).fetchall()
+        query = conn.execute(text(
+            f"SELECT * FROM file WHERE name LIKE '%{filename}%' ORDER BY id DESC"
+        )).fetchall()
+
     return render_template("index.html", files=query)
+
+
+@app.route('/files/search/<int:id>', methods=['GET'])
+def search_file(id=None):
+    file = db.session.get(File, id)
+    col = file.columns.split("; ")
+    df = pd.read_csv(
+        io.BytesIO(file.data),
+        encoding='utf8',
+        sep=None,
+        engine='python'
+    )
+    df.to_sql(f'{file.name[:len(file.name) - 4]}{id}', con=db.engine)
+
+    with db.engine.connect() as conn:
+        query = conn.execute(
+            text(f"SELECT * FROM '{file.name[:len(file.name) - 4]}{id}'")
+        ).fetchall()
+        conn.execute(
+            text(f"DROP TABLE '{file.name[:len(file.name) - 4]}{id}'"))
+
+    return render_template("file.html", file=file, columns=col, query=query)
 
 
 if __name__ == "__main__":
