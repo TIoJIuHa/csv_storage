@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Главная страница
+{% endblock %}
+
+{% block body %}
+    <h1>Все файлы</h1>
+    {% for file in files %}
+        <div class="alert alert-success">
+            <a href="/files/search/{{ file.id }}" class="alert-link"> <h4>{{ file.name }}</h4></a>
+            <b>Колонки:</b> {{file.columns}}
+        </div>
+    {% endfor %}
+{% endblock %}
