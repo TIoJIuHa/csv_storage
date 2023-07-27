@@ -8,7 +8,6 @@ colorama==0.4.6
 connexion==2.14.1
 Flask==2.2.3
 flask-marshmallow==0.14.0
-Flask-REST-JSONAPI==0.31.2
 Flask-SQLAlchemy==3.0.3
 greenlet==2.0.2
 idna==3.4
