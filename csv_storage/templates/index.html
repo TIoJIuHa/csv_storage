@@ -9,7 +9,11 @@
     {% for file in files %}
         <div class="alert alert-success">
             <a href="/files/search/{{ file.id }}" class="alert-link"><h4>{{ file.name }}</h4></a>
-            <b>Колонки:</b> {{file.columns}}<br>
+            <b>Колонки:</b>
+            {% for column in file.columns %}
+                {{column}}; 
+            {% endfor %}
+            <br>
             <a href="/files/{{ file.id }}/delete" class="link-secondary text-decoration-none"><small>удалить файл</small>
             {% if err %}
             <small>Ошибка при удалении</small>

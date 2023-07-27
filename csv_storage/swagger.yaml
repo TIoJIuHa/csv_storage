@@ -1,0 +1,86 @@
+openapi: 3.0.0
+info:
+  title: "RP Flask REST API"
+  description: "An API about scv files"
+  version: "1.0.0"
+
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    File:
+      type: "object"
+      required:
+        - name
+        - data
+      properties:
+        name:
+          type: "string"
+        data:
+          type: "string"
+  
+  parameters:
+    file_id:
+      name: "file_id"
+      description: "file id to get"
+      in: path
+      required: True
+      schema:
+        type: integer
+
+paths:
+  /files:
+    get:
+      operationId: "api.display_all"
+      tags:
+        - "Files"
+      summary: "Display the list of files"
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: "String to search in file name"
+      responses:
+        "200":
+          description: "Successfully displayed files"
+    post:
+      operationId: "api.upload_file"
+      tags:
+        - "Files"
+      summary: "Upload file"
+      requestBody:
+          description: "File to upload"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "file"
+                $ref: "#/components/schemas/File"
+      responses:
+        "201":
+          description: "Successfully uploaded file"
+        "400":
+          description: "Bad Request"
+  /files/{file_id}:
+    get:
+      operationId: "api.read_file"
+      tags:
+        - "Files"
+      summary: "Read file"
+      parameters:
+        - $ref: "#/components/parameters/file_id"
+      responses:
+        "200":
+          description: "Successfully read file"
+    delete:
+      tags:
+        - "Files"
+      operationId: "api.delete_file"
+      summary: "Delete file"
+      parameters:
+        - $ref: "#/components/parameters/file_id"
+      responses:
+        "204":
+          description: "Successfully deleted file"

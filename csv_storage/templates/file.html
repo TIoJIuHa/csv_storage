@@ -12,9 +12,9 @@
     <table id="myTable" class="display" style="width:100%">
       <thead>
         <tr>
-          <th>№</th>
-          {% for column in columns%}
-            <th>{{ column }}</th>
+          <th><center>№</center></th>
+          {% for column in file.columns%}
+            <th><center>{{ column }}</center></th>
           {% endfor %}
         </tr>
       </thead>
